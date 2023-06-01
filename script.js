@@ -1,6 +1,6 @@
 let itemData = [];
 let displayedItems = 0;
-const itemsPerPage = 20;
+const itemsPerPage = 200;
 let searchInput = '';
 
 function loadJSON(callback) {
@@ -47,14 +47,22 @@ function formatPrice(price) {
 function getItemIcon(itemName) {
     if (itemName.includes('Sticker')) {
         return 'Sticker.png';
+    } else if (itemName.includes('Key')) {
+        return 'Key.png';
     } else if (itemName.includes('★')) {
         if (itemName.includes('Glove')) {
             return 'Glove.png';
-        } else {
+        } else if (itemName.includes('Patch')) {
+            return 'Patch.png'
+        } {
             return 'Knife.png';
         }
+    } else if (itemName.includes('Case') && !itemName.includes('Hardened') || (itemName.includes('Box')) || (itemName.includes('Package'))) {
+        return 'Case.png';
     } else if (itemName.includes('Music Kit')) {
         return 'Music.png';
+    } else if (itemName.includes('Patch')) {
+        return 'Patch.png';
     } else if (
         itemName.includes('AWP') ||
         itemName.includes('AK-47') ||
@@ -84,7 +92,11 @@ function getItemIcon(itemName) {
         itemName.includes('Desert Eagle') ||
         itemName.includes('R8 Revolver') ||
         itemName.includes('Negev') ||
-        itemName.includes('XM1014')
+        itemName.includes('XM1014') ||
+        itemName.includes('M249') ||
+        itemName.includes('P250') ||
+        itemName.includes('MAG-7') ||
+        itemName.includes('MP5-SD')
     ) {
         return 'Gun.png';
     } else if (
@@ -106,7 +118,8 @@ function getItemIcon(itemName) {
         itemName.includes('Michael Syfers') ||
         itemName.includes('Safecracker Voltzmann') ||
         itemName.includes('Sir Bloody Darryl') ||
-        itemName.includes('Sir Bloody Silent Darryl')
+        itemName.includes('Sir Bloody Silent Darryl') ||
+        itemName.includes('Lieutenant')
     ) {
         return 'Agent.png';
     }
