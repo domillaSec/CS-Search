@@ -1,0 +1,87 @@
+* {
+    font-family: 'Roboto', sans-serif;
+}
+
+body {
+    background-color: rgb(24, 24, 24);
+    margin: 0;
+    padding: 0;
+    overflow: auto;
+    /* Enable scrolling */
+}
+
+.background-image {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100vh;
+    background-image: url('./dust2.jfif');
+    background-size: cover;
+    filter: blur(10px);
+    /* Apply blur effect */
+    z-index: -1;
+    /* Place it behind other content */
+}
+
+.container {
+    max-width: 600px;
+    margin: 0 auto;
+    text-align: center;
+}
+
+h1 {
+    color: rgb(190, 190, 190);
+}
+
+input[type="text"] {
+    padding: 5px;
+    width: 585px;
+    color: rgb(175, 175, 175);
+    background-color: rgba(15, 15, 15, 0.75);
+    height: 30px;
+    padding-left: 9.5px;
+    outline: none;
+    border-right: none;
+    border-left: none;
+    border-top: none;
+    border-bottom: 1px solid white;
+}
+
+#results {
+    margin-top: 20px;
+    text-align: left;
+}
+
+.item {
+    padding: 15px;
+    padding-left: 50px;
+    color: rgb(190, 190, 190);
+}
+
+.item-icon {
+    margin-top: -15px;
+    margin-left: -50px;
+    position: absolute;
+    width: 50px;
+    height: 50px;
+}
+
+.item:nth-child(even) {
+    background-color: rgba(44, 44, 44, 0.75);
+}
+
+.item:nth-child(odd) {
+    background-color: rgba(22, 22, 22, 0.75);
+}
+
+#showMoreButton {
+    margin-top: 10px;
+    width: 600px;
+    display: none;
+    color: white;
+    background-color: rgb(15, 15, 15);
+    border: 1px solid white;
+    cursor: pointer;
+    padding: 30px;
+}
