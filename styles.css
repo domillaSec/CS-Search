@@ -67,17 +67,36 @@ input[type="text"] {
 }
 
 .item {
+    display: flex;
+    align-items: center;
     padding: 15px;
-    padding-left: 50px;
+    padding-left: 60px;
     color: rgb(190, 190, 190);
+    height: 20px;
+    white-space: break-spaces;
+    transition: all 0.2s ease-in-out;
+}
+
+.item:hover {
+    height: 60px;
+    padding-left: 110px;
+    transition: all 0.2s ease-in-out;
+}
+
+.item:hover .item-icon {
+    width: 95px;
+    height: 80px;
+    margin-left: -107.5px;
+    transition: all 0.2s ease-in-out;
 }
 
 .item-icon {
-    margin-top: -15px;
-    margin-left: -50px;
+    margin-top: 0px;
+    margin-left: -57.5px;
     position: absolute;
     width: 50px;
-    height: 50px;
+    height: 40px;
+    transition: all 0.2s ease-in-out;
 }
 
 .item:nth-child(even) {

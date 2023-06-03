@@ -4,16 +4,67 @@ const itemsPerPage = 200;
 let searchInput = '';
 
 function loadJSON(callback) {
-    const xhr = new XMLHttpRequest();
-    xhr.overrideMimeType("application/json");
-    xhr.open('GET', 'output.json', true);
-    xhr.onreadystatechange = function () {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-            callback(xhr.responseText);
+    var jsonData = {};
+    var count = 0;
+    var files = [
+        { name: 'output.json', key: 'items' },
+        { name: 'images.json', key: 'images' }
+    ];
+
+    function handleResponse(responseText, key) {
+        try {
+            jsonData[key] = JSON.parse(responseText);
+            count++;
+
+            if (count === files.length) {
+                callback(jsonData);
+            }
+        } catch (error) {
+            console.error('Error parsing JSON:', error);
+            console.log('Response text:', responseText);
         }
-    };
-    xhr.send(null);
+    }
+
+    files.forEach(function (file) {
+        var xhr = new XMLHttpRequest();
+        xhr.overrideMimeType('application/json');
+        xhr.open('GET', file.name, true);
+        xhr.onreadystatechange = function () {
+            if (xhr.readyState === 4 && xhr.status === 200) {
+                handleResponse(xhr.responseText, file.key);
+            }
+        };
+        xhr.send();
+    });
 }
+
+
+function getItemIcon(itemName, imagesData) {
+    if (!imagesData) {
+      console.error('Images data not loaded.');
+      return '';
+    }
+  
+    const wearLevels = [
+      '(Factory New)',
+      '(Minimal Wear)',
+      '(Field Tested)',
+      '(Well-Worn)',
+      '(Battle-Scarred)'
+    ];
+  
+    for (const wearLevel of wearLevels) {
+      const altItemName = itemName.replace(wearLevels[0], wearLevel);
+      if (imagesData.hasOwnProperty(altItemName)) {
+        return imagesData[altItemName];
+      }
+    }
+  
+    console.error('Image URL not found for item:', itemName);
+    return './Default.png';
+  }
+  
+  
 
 function searchItems() {
     searchInput = document.getElementById('searchInput').value.toLowerCase();
@@ -22,7 +73,7 @@ function searchItems() {
     displayedItems = 0;
 
     loadJSON(function (response) {
-        itemData = Object.entries(JSON.parse(response)).map(([name, price]) => ({ name, price }));
+        itemData = Object.entries(response.items).map(([name, price]) => ({ name, price }));
 
         // Sort the itemData array based on price
         itemData.sort((a, b) => {
@@ -31,7 +82,7 @@ function searchItems() {
             return priceB - priceA;
         });
 
-        displayItems();
+        displayItems(response);
     });
 }
 
@@ -44,92 +95,21 @@ function formatPrice(price) {
     return `$${formattedPrice.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ',')}`;
 }
 
-function getItemIcon(itemName) {
-    if (itemName.includes('Sticker')) {
-        return 'Sticker.png';
-    } else if (itemName.includes('Key')) {
-        return 'Key.png';
-    } else if (itemName.includes('★')) {
-        if (itemName.includes('Glove')) {
-            return 'Glove.png';
-        } else if (itemName.includes('Patch')) {
-            return 'Patch.png'
-        } {
-            return 'Knife.png';
-        }
-    } else if (itemName.includes('Case') && !itemName.includes('Hardened') || (itemName.includes('Box')) || (itemName.includes('Package'))) {
-        return 'Case.png';
-    } else if (itemName.includes('Music Kit')) {
-        return 'Music.png';
-    } else if (itemName.includes('Patch')) {
-        return 'Patch.png';
-    } else if (
-        itemName.includes('AWP') ||
-        itemName.includes('AK-47') ||
-        itemName.includes('M4A4') ||
-        itemName.includes('M4A1-S') ||
-        itemName.includes('Galil AR') ||
-        itemName.includes('FAMAS') ||
-        itemName.includes('SCAR-20') ||
-        itemName.includes('G3SG1') ||
-        itemName.includes('SG 553') ||
-        itemName.includes('AUG') ||
-        itemName.includes('SSG 08') ||
-        itemName.includes('AWP') ||
-        itemName.includes('P90') ||
-        itemName.includes('MP7') ||
-        itemName.includes('MP9') ||
-        itemName.includes('MAC-10') ||
-        itemName.includes('UMP-45') ||
-        itemName.includes('PP-Bizon') ||
-        itemName.includes('Glock-18') ||
-        itemName.includes('USP-S') ||
-        itemName.includes('P2000') ||
-        itemName.includes('Dual Berettas') ||
-        itemName.includes('Tec-9') ||
-        itemName.includes('Five-SeveN') ||
-        itemName.includes('CZ75-Auto') ||
-        itemName.includes('Desert Eagle') ||
-        itemName.includes('R8 Revolver') ||
-        itemName.includes('Negev') ||
-        itemName.includes('XM1014') ||
-        itemName.includes('M249') ||
-        itemName.includes('P250') ||
-        itemName.includes('MAG-7') ||
-        itemName.includes('MP5-SD')
-    ) {
-        return 'Gun.png';
-    } else if (
-        itemName.includes('Ava') ||
-        itemName.includes('The Doctor') ||
-        itemName.includes('Dragomir') ||
-        itemName.includes('Rezan') ||
-        itemName.includes('Maximus') ||
-        itemName.includes('Blackwolf') ||
-        itemName.includes('John Pilgrim') ||
-        itemName.includes('Seal Team 6 Soldier') ||
-        itemName.includes('Buckshot') ||
-        itemName.includes('Lt. Commander Ricksaw') ||
-        itemName.includes('Ground Rebel') ||
-        itemName.includes('Osiris') ||
-        itemName.includes('Prof. Shahmat') ||
-        itemName.includes('3rd Commando Company') ||
-        itemName.includes('Bio-Haz Specialist') ||
-        itemName.includes('Michael Syfers') ||
-        itemName.includes('Safecracker Voltzmann') ||
-        itemName.includes('Sir Bloody Darryl') ||
-        itemName.includes('Sir Bloody Silent Darryl') ||
-        itemName.includes('Lieutenant')
-    ) {
-        return 'Agent.png';
-    }
-
-    return 'Default.png';
-}
-
-function displayItems() {
+function displayItems(jsonData) {
     const resultsDiv = document.getElementById('results');
-    const matchingItems = itemData.filter(item => item.name.toLowerCase().includes(searchInput));
+
+    // Match items based on search input
+    const matchingItems = itemData.filter(item => {
+        if (searchInput.startsWith('/') && searchInput.endsWith('/')) {
+            // Input is a regular expression
+            const regexInput = searchInput.slice(1, -1);
+            const regex = new RegExp(regexInput);
+            return regex.test(item.name.toLowerCase());
+        } else {
+            // Input is a normal string
+            return item.name.toLowerCase().includes(searchInput);
+        }
+    });
 
     if (matchingItems.length === 0) {
         resultsDiv.innerHTML = '<p style="color: white;">No results found.</p>';
@@ -141,17 +121,20 @@ function displayItems() {
 
             const itemIcon = document.createElement('img');
             itemIcon.classList.add('item-icon');
-            itemIcon.src = getItemIcon(item.name);
+            itemIcon.src = getItemIcon(item.name, jsonData.images);
 
             const itemText = document.createElement('span');
+            itemText.style.maxWidth = "375px";
             itemText.textContent = item.name;
 
             const priceText = document.createElement('span');
-            priceText.textContent = formatPrice(item.price);
+            priceText.style.position = "Absolute"
+            priceText.style.left = "1165px";
+            priceText.style.fontWeight = "bold";
+            priceText.textContent = "\u00A0" + formatPrice(item.price);
 
             itemDiv.appendChild(itemIcon);
             itemDiv.appendChild(itemText);
-            itemDiv.appendChild(document.createTextNode(' - '));
             itemDiv.appendChild(priceText);
 
             resultsDiv.appendChild(itemDiv);
@@ -176,8 +159,10 @@ function displayItems() {
 }
 
 function showMore() {
-    displayItems();
-}
+    loadJSON(function(response) {
+      displayItems(response);
+    });
+  }
 
 // Automatically display items on page load
 window.addEventListener('load', searchItems);
